@@ -1,0 +1,10 @@
+tambahan 
+konversi meter ke yard ketika beli meteran, untuk beli eceran ada yang mau meter dan yard
+
+harga harus bisa ngetik sendiri, karna harganya beda beda
+
+trus kita kasih harga hpp aja yang disimpen trus nanti karyawan ga bisa lihat
+
+kita harus ada akun khusus untuk pagawai untuk lihat stok barang aja 
+
+tampilannya dibuat jadi hp semuanya 

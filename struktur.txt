@@ -1,0 +1,45 @@
+.
+├── ai_promt.txt
+├── app
+│   ├── app.vue
+│   ├── assets
+│   │   └── css
+│   │       └── tailwind.css
+│   ├── layouts
+│   │   └── dashboard.vue
+│   └── pages
+│       ├── bahan.vue
+│       ├── barang-masuk.vue
+│       ├── index.vue
+│       ├── kasir
+│       │   └── [token].vue
+│       ├── login.vue
+│       ├── pegawai.vue
+│       ├── pengaturan.vue
+│       ├── pos.vue
+│       ├── register.vue
+│       └── riwayat.vue
+├── dist -> /home/work-space/0Project/Textile_POS/.output/public
+├── nuxt.config.ts
+├── package.json
+├── package-lock.json
+├── public
+│   ├── favico.ico
+│   ├── pwa-192x192.png
+│   ├── pwa-512x512.png
+│   └── robots.txt
+├── README.md
+├── server
+│   └── api
+│       ├── kasir
+│       │   └── [token].get.ts
+│       ├── pegawai
+│       │   └── create.post.ts
+│       └── tenant
+│           └── generate-token.post.ts
+├── struktur.txt
+├── tailwind.config.js
+├── task.txt
+└── tsconfig.json
+
+14 directories, 29 files

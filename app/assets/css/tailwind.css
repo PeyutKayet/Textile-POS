@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    /* Matiin efek mentul-mentul (overscroll / pull-to-refresh) di HP */
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    /* Matiin menu popup Google/iOS pas teken lama */
+    -webkit-touch-callout: none;
+    /* Matiin fitur blok teks (copy/paste) biar kerasa kayak aplikasi beneran */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Ngilangin kedip biru pas nge-tap tombol di HP */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Pengecualian: Input dan Textarea tetep harus bisa diklik & diseleksi teksnya biar bisa ngetik */
+  input, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+}

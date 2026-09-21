@@ -84,93 +84,86 @@
     </div>
 
     <!-- Bagian 2: Input HPP -->
-    <div class="bg-white p-5 md:p-7 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="bg-white p-5 md:p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="shrink-0 flex items-center gap-3">
         <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
         <div>
           <label class="block text-sm font-bold text-gray-800 uppercase tracking-wide">Modal (HPP) per Satuan</label>
-          <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Akan diterapkan ke semua roll di bawah</p>
+          <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Akan diterapkan ke semua roll</p>
         </div>
       </div>
-      <div class="relative flex-1 max-w-sm w-full">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">Rp</span>
+      <div class="relative flex-1 max-w-xs w-full">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">Rp</span>
         <input 
           v-model="batchHppDisplay" 
           type="text" 
           placeholder="0" 
-          class="w-full bg-gray-50 border border-gray-200 py-3 pl-10 pr-4 rounded-2xl focus:outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 text-lg font-bold text-gray-900 transition shadow-inner"
+          class="w-full bg-gray-50 border border-gray-200 py-2.5 pl-9 pr-4 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 text-base font-bold text-gray-900 transition shadow-inner"
         >
       </div>
     </div>
 
     <!-- Bagian 3: List Roll Dinamis -->
-    <div class="bg-white p-5 md:p-7 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-      <div class="flex items-center gap-3 mb-5">
+    <div class="bg-white p-5 md:p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+      <div class="flex items-center gap-3 mb-4">
         <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">3</span>
         <h2 class="text-sm font-bold uppercase tracking-wide text-gray-800">Daftar Roll Masuk</h2>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-3">
         <!-- Loop Baris Roll -->
         <div 
           v-for="(roll, index) in rollList" 
           :key="index" 
-          class="group relative flex flex-col sm:flex-row gap-4 bg-gray-50/70 p-4 sm:p-5 rounded-2xl border border-gray-100 hover:border-blue-100 transition shadow-sm"
+          class="group relative flex items-center gap-3 bg-gray-50/70 p-3 sm:p-4 rounded-xl border border-gray-100 hover:border-blue-100 transition shadow-sm"
         >
-          <!-- Nomor urut -->
-          <div class="hidden sm:flex w-8 h-8 rounded-full bg-white border border-gray-200 items-center justify-center font-bold text-gray-400 text-xs shrink-0 shadow-sm">
-            {{ index + 1 }}
-          </div>
-          
-          <!-- Input Panjang & Lokasi -->
-          <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block sm:hidden text-[10px] font-bold text-gray-400 uppercase mb-1">Panjang Roll {{ index + 1 }}</label>
-              <div class="relative">
-                <input 
-                  v-model="roll.initial_length" 
-                  ref="qtyInputs"
-                  @keyup.enter="simpanBarangMasuk"
-                  type="number" 
-                  placeholder="Panjang (Qty)" 
-                  class="w-full bg-white border border-gray-200 py-3 px-4 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 text-base font-bold text-gray-900 shadow-sm transition" 
-                  required
-                >
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 uppercase">QTY</span>
-              </div>
-            </div>
-            <div>
-              <label class="block sm:hidden text-[10px] font-bold text-gray-400 uppercase mb-1">Lokasi Rak</label>
-              <div class="relative">
-                <input 
-                  v-model="roll.location" 
-                  @keyup.enter="simpanBarangMasuk"
-                  type="text" 
-                  placeholder="Lokasi Rak" 
-                  class="w-full bg-white border border-gray-200 py-3 px-4 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 text-base font-bold text-gray-900 shadow-sm transition"
-                >
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 uppercase hidden sm:block">RAK</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tombol Hapus Baris -->
+          <!-- Tombol Hapus X -->
           <button 
             v-if="rollList.length > 1" 
             @click="hapusBaris(index)" 
-            class="sm:shrink-0 w-full sm:w-auto bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 px-4 py-3 rounded-xl flex items-center justify-center transition font-bold text-sm gap-2" 
+            class="absolute top-1 right-1 text-gray-400 hover:text-red-500 hover:bg-red-50 w-7 h-7 rounded-full flex items-center justify-center transition text-xl leading-none z-10 font-bold" 
             title="Hapus baris"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            <span class="sm:hidden">Hapus Roll Ini</span>
+            &times;
           </button>
+
+          <!-- Nomor urut -->
+          <div class="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-400 text-[10px] shrink-0 shadow-sm">
+            {{ index + 1 }}
+          </div>
+          
+          <!-- Input Panjang & Lokasi Sejajar -->
+          <div class="flex-1 grid grid-cols-2 gap-3 pr-6 sm:pr-8">
+            <div class="relative">
+              <input 
+                v-model="roll.initial_length" 
+                ref="qtyInputs"
+                @keyup.enter="simpanBarangMasuk"
+                type="number" 
+                placeholder="Panjang" 
+                class="w-full bg-white border border-gray-200 py-2.5 px-3 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 text-sm font-bold text-gray-900 shadow-sm transition" 
+                required
+              >
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-400 uppercase hidden sm:block">QTY</span>
+            </div>
+            <div class="relative">
+              <input 
+                v-model="roll.location" 
+                @keyup.enter="simpanBarangMasuk"
+                type="text" 
+                placeholder="Lokasi (Opsional)" 
+                class="w-full bg-white border border-gray-200 py-2.5 px-3 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 text-sm font-bold text-gray-900 shadow-sm transition"
+              >
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-400 uppercase hidden sm:block">RAK</span>
+            </div>
+          </div>
         </div>
       </div>
       
       <!-- Tombol Tambah Baris Cepat -->
       <button 
         @click="tambahBaris" 
-        class="w-full mt-4 bg-emerald-50/80 text-emerald-600 border-2 border-emerald-200 border-dashed py-4 rounded-2xl text-sm font-bold hover:bg-emerald-100 hover:border-emerald-300 transition flex items-center justify-center gap-2"
+        class="w-full mt-4 bg-emerald-50/80 text-emerald-600 border border-emerald-200 border-dashed py-3 rounded-xl text-sm font-bold hover:bg-emerald-100 hover:border-emerald-300 transition flex items-center justify-center gap-1.5"
       >
         <span class="text-xl leading-none">+</span> Tambah Baris Roll Lagi
       </button>

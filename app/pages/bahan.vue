@@ -115,7 +115,8 @@ watch(searchQuery, (newVal) => {
       fabrics.value = data.map(fabric => ({
         ...fabric,
         totalRolls: fabric.total_rolls,
-        totalStock: fabric.total_stock
+        // Ubah jadi angka dan patok 2 desimal
+        totalStock: Number(fabric.total_stock || 0).toFixed(2) 
       }))
     } else if (error) {
       console.error('Gagal cari data stok:', error.message)
@@ -151,7 +152,8 @@ const loadFabrics = async () => {
     fabrics.value = data.map(fabric => ({
       ...fabric,
       totalRolls: fabric.total_rolls,
-      totalStock: fabric.total_stock
+      // Ubah jadi angka dan patok 2 desimal
+      totalStock: Number(fabric.total_stock || 0).toFixed(2)
     }))
   } else if (error) {
     console.error('Gagal tarik data stok awal:', error.message)

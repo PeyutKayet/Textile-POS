@@ -124,8 +124,8 @@
       </main>
 
       <!-- ============ BOTTOM NAV (mobile) ============ -->
-      <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 z-40" style="padding-bottom: env(safe-area-inset-bottom)">
-        <div class="flex items-center justify-around h-16">
+      <nav class="md:hidden fixed bottom-4 inset-x-4 bg-white/85 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-[2rem] z-40" style="padding-bottom: env(safe-area-inset-bottom)">
+        <div class="flex items-center justify-around h-16 px-1">
           <NuxtLink
             v-for="item in activeMenuItems"
             :key="item.to"

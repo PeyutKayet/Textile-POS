@@ -1,10 +1,10 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-6 space-y-5 pb-24 md:pb-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8 space-y-6 pb-28 md:pb-12">
     
     <!-- Top Bar: Pencarian -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div class="relative w-full sm:w-80">
-        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+      <div class="relative w-full sm:w-96">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
           </svg>
@@ -13,15 +13,15 @@
           v-model="searchQuery" 
           type="text" 
           placeholder="Cari nama kain..." 
-          class="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition shadow-sm placeholder:text-gray-400"
+          class="w-full bg-white border border-gray-100 rounded-2xl pl-11 pr-4 py-3.5 text-base focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 transition shadow-[0_4px_20px_rgb(0,0,0,0.03)] placeholder:text-gray-400 font-medium"
         >
       </div>
     </div>
 
-    <!-- List Bahan (Mode Card di HP, Mode Grid di Desktop) -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+    <!-- List Bahan (Cards di HP, Grid di Desktop) -->
+    <div class="bg-transparent md:bg-white md:rounded-3xl md:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:border md:border-gray-100 overflow-hidden flex flex-col">
       <!-- Header Desktop (Sembunyi di HP) -->
-      <div class="hidden md:grid grid-cols-5 gap-4 px-5 py-4 bg-gray-50/50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">
+      <div class="hidden md:grid grid-cols-5 gap-4 px-6 py-5 bg-gray-50/70 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
         <div class="col-span-2">Nama Kain & SKU</div>
         <div>Stok Roll</div>
         <div>Total Ukuran</div>
@@ -29,36 +29,38 @@
       </div>
 
       <!-- Looping Data -->
-      <div class="divide-y divide-gray-100">
-        <div v-for="item in filteredFabrics" :key="item.id" class="p-4 md:px-5 md:py-4 flex flex-col md:grid md:grid-cols-5 md:items-center gap-3 hover:bg-gray-50/50 transition">
+      <div class="flex flex-col gap-4 md:gap-0 md:divide-y md:divide-gray-100">
+        <div v-for="item in filteredFabrics" :key="item.id" class="bg-white rounded-3xl md:rounded-none shadow-sm md:shadow-none border border-gray-100 md:border-0 p-5 md:px-6 md:py-5 flex flex-col md:grid md:grid-cols-5 md:items-center gap-4 hover:bg-blue-50/30 transition">
           
           <!-- Baris 1 HP / Kolom 1-2 Desktop: Nama Kain & SKU -->
           <div class="md:col-span-2 min-w-0">
-            <div class="font-bold text-sm text-gray-900 truncate">{{ item.name }}</div>
-            <div class="text-[11px] text-gray-400 font-mono mt-0.5">SKU: {{ item.sku || '-' }}</div>
+            <div class="font-extrabold text-lg text-gray-900 truncate">{{ item.name }}</div>
+            <div class="text-xs text-gray-400 font-mono mt-1">SKU: {{ item.sku || '-' }}</div>
           </div>
 
           <!-- Baris 2 HP / Kolom 3-5 Desktop: Detail Stok & Lokasi -->
-          <div class="flex justify-between items-center md:contents mt-1 md:mt-0">
+          <div class="flex flex-wrap items-center gap-2 md:contents mt-1 md:mt-0">
             
             <!-- Stok Roll -->
-            <div>
-              <span class="inline-flex items-center justify-center bg-blue-50 text-blue-700 px-2.5 py-1.5 rounded-lg text-xs font-bold border border-blue-100">
+            <div class="md:w-full">
+              <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold border border-blue-100 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 {{ item.totalRolls }} Roll
               </span>
             </div>
             
             <!-- Total Ukuran -->
-            <div class="flex items-center gap-1.5">
-              <span class="md:hidden text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total</span>
-              <div class="text-sm font-bold text-emerald-600">
-                {{ item.totalStock }} <span class="text-[10px] font-semibold text-emerald-600/70 uppercase">{{ item.base_unit || 'm/yd' }}</span>
-              </div>
+            <div class="md:w-full">
+              <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold border border-emerald-100 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                {{ item.totalStock }} {{ item.base_unit || 'm/yd' }}
+              </span>
             </div>
             
             <!-- Lokasi -->
-            <div>
-              <span class="inline-flex items-center justify-center bg-gray-50 text-gray-600 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border border-gray-200 whitespace-nowrap">
+            <div class="md:w-full">
+              <span class="inline-flex items-center gap-1.5 bg-gray-50 text-gray-600 px-3 py-1.5 rounded-full text-xs font-bold border border-gray-200 shadow-sm whitespace-nowrap">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                 {{ item.location || 'Belum set' }}
               </span>
             </div>
@@ -67,10 +69,10 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="filteredFabrics.length === 0" class="p-12 text-center flex flex-col items-center justify-center">
-          <span class="text-3xl mb-3 opacity-40">🔍</span>
-          <p class="text-sm font-semibold text-gray-700">Kain tidak ditemukan</p>
-          <p class="text-xs text-gray-400 mt-1">Coba gunakan kata kunci lain</p>
+        <div v-if="filteredFabrics.length === 0" class="p-16 text-center flex flex-col items-center justify-center bg-white rounded-3xl shadow-sm border border-gray-100 md:shadow-none md:border-0 md:rounded-none">
+          <span class="text-5xl mb-4 opacity-30">🔍</span>
+          <p class="text-base font-bold text-gray-700">Kain tidak ditemukan</p>
+          <p class="text-sm text-gray-400 mt-1">Coba gunakan kata kunci lain</p>
         </div>
       </div>
     </div>

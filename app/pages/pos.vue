@@ -94,8 +94,8 @@
             <div
               v-for="roll in rolls"
               :key="roll.id"
-              class="border rounded-xl p-3.5 md:p-4 transition"
-              :class="inCart(roll.id) ? 'bg-blue-50/40 border-blue-200' : 'bg-white border-gray-200 hover:border-gray-300'"
+              class="border rounded-2xl p-4 transition shadow-sm hover:shadow-md"
+              :class="inCart(roll.id) ? 'bg-blue-50/40 border-blue-200' : 'bg-white border-gray-100 hover:border-gray-300'"
             >
               <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div class="flex-1 min-w-0">
@@ -109,26 +109,31 @@
                   </p>
                 </div>
 
-                <!-- Mode eceran: input meter langsung di kartu roll -->
-                <div v-if="eceranRollId === roll.id" class="flex items-center gap-2 w-full sm:w-auto">
-                  <div class="relative flex-1 sm:w-28">
-                    <input
-                      v-model.number="eceranQty"
-                      type="number" min="0" step="0.1" :max="roll.current_length"
-                      @keyup.enter="tambahEceran(roll)"
-                      class="w-full border border-blue-300 rounded-lg p-2 pl-3 pr-12 text-sm font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 bg-white"
-                      placeholder="0"
-                    />
-                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">{{ selectedFabric.base_unit }}</span>
+                <!-- Mode eceran: input meter langsung di kartu roll (Diperbesar untuk touch) -->
+                <div v-if="eceranRollId === roll.id" class="flex flex-col w-full sm:w-auto mt-3 pt-3 border-t border-gray-100">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Input Potongan Eceran</p>
+                  <div class="flex items-center gap-2 w-full">
+                    <div class="relative flex-1 sm:w-32">
+                      <input
+                        v-model.number="eceranQty"
+                        type="number" min="0" step="0.1" :max="roll.current_length"
+                        @keyup.enter="tambahEceran(roll)"
+                        class="w-full border-2 border-blue-200 rounded-xl p-3 pl-4 pr-12 text-lg font-bold text-blue-700 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 bg-blue-50/30"
+                        placeholder="0"
+                      />
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-blue-400">{{ selectedFabric.base_unit }}</span>
+                    </div>
+                    <button
+                      @click="tambahEceran(roll)"
+                      :disabled="!eceranQty || eceranQty <= 0"
+                      class="bg-blue-600 text-white text-sm font-bold px-5 py-3.5 rounded-xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm shadow-blue-600/30"
+                    >
+                      Tambah
+                    </button>
+                    <button @click="eceranRollId = null" class="bg-gray-50 border border-gray-200 text-gray-400 hover:text-gray-600 p-3.5 rounded-xl transition">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
                   </div>
-                  <button
-                    @click="tambahEceran(roll)"
-                    :disabled="!eceranQty || eceranQty <= 0"
-                    class="bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    Tambah
-                  </button>
-                  <button @click="eceranRollId = null" class="text-gray-400 hover:text-gray-600 text-lg leading-none px-1">&times;</button>
                 </div>
 
                 <div v-else class="flex gap-2 w-full sm:w-auto">
@@ -269,91 +274,111 @@
       <span class="tabular-nums">{{ rupiah(grandTotal) }}</span>
     </button>
 
-    <!-- ============ MOBILE: cart slide-over ============ -->
+    <!-- ============ MOBILE: cart full-screen modal ============ -->
     <Teleport to="body">
-      <div v-if="mobileCartOpen" class="lg:hidden fixed inset-0 z-50">
-        <div class="absolute inset-0 bg-gray-900/40" @click="mobileCartOpen = false"></div>
-        <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[85vh] flex flex-col shadow-2xl">
-          <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-            <h2 class="font-bold text-gray-900">Keranjang <span class="text-gray-400 font-semibold text-sm">({{ cart.length }})</span></h2>
-            <button @click="mobileCartOpen = false" class="text-gray-400 hover:text-gray-600 text-2xl leading-none px-1">&times;</button>
+      <Transition
+        enter-active-class="transition transform duration-300 ease-out"
+        enter-from-class="translate-y-full opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+        leave-active-class="transition transform duration-200 ease-in"
+        leave-from-class="translate-y-0 opacity-100"
+        leave-to-class="translate-y-full opacity-0"
+      >
+        <div v-if="mobileCartOpen" class="lg:hidden fixed inset-0 z-[60] bg-gray-50 flex flex-col">
+          <div class="flex items-center justify-between px-5 py-4 bg-white border-b border-gray-100 shrink-0 shadow-sm">
+            <h2 class="font-bold text-gray-900 text-lg">Keranjang <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-sm ml-1">({{ cart.length }})</span></h2>
+            <button @click="mobileCartOpen = false" class="bg-gray-100 text-gray-500 hover:text-gray-700 p-2 rounded-full transition">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
+          
+          <div class="overflow-y-auto px-4 py-5 space-y-4 flex-1">
+            <div v-if="cart.length === 0" class="py-20 text-center flex flex-col items-center">
+              <span class="text-5xl opacity-30 mb-3">🛒</span>
+              <p class="text-gray-400 font-semibold">Keranjang masih kosong</p>
+            </div>
 
-          <div class="overflow-y-auto px-5 py-4 space-y-3 flex-1">
-            <div v-if="cart.length === 0" class="py-10 text-center text-xs text-gray-400">Keranjang kosong</div>
-
-            <div v-for="(item, index) in cart" :key="item.rollId" class="border border-gray-100 rounded-xl p-3 bg-gray-50/50">
-              <div class="flex justify-between items-start gap-2">
+            <div v-for="(item, index) in cart" :key="item.rollId" class="bg-white border border-gray-100 shadow-sm rounded-2xl p-4">
+              <div class="flex justify-between items-start gap-2 mb-3">
                 <div class="min-w-0">
-                  <p class="font-semibold text-sm truncate">{{ item.fabricName }}</p>
-                  <p class="text-[11px] text-gray-400 font-mono">{{ item.rollSku }}</p>
+                  <p class="font-bold text-base text-gray-900 truncate">{{ item.fabricName }}</p>
+                  <p class="text-xs text-gray-400 font-mono mt-0.5">{{ item.rollSku }}</p>
                 </div>
-                <button @click="hapusDariKeranjang(index)" class="text-gray-300 hover:text-red-500 text-lg leading-none">&times;</button>
+                <button @click="hapusDariKeranjang(index)" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-xl transition">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
               </div>
 
-              <div v-if="!item.isUtuh" class="flex items-center gap-2 mt-2.5">
-                <div class="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden">
-                  <button @click="item.qty = Math.max(0, +(item.qty - 1).toFixed(2))" class="px-2.5 py-1.5 text-gray-500 hover:bg-gray-100 font-bold">−</button>
+              <div v-if="!item.isUtuh" class="flex flex-wrap items-center gap-3 mt-1 mb-3">
+                <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden shadow-inner">
+                  <button @click="item.qty = Math.max(0, +(item.qty - 1).toFixed(2))" class="px-4 py-3 text-gray-600 hover:bg-gray-200 font-bold text-lg leading-none">−</button>
                   <input
                     v-model.number="item.qty" type="number" min="0" step="0.1" :max="item.maxStock"
-                    class="w-14 text-center text-sm font-bold text-gray-900 border-x border-gray-200 py-1.5 focus:outline-none"
+                    class="w-16 text-center text-base font-bold text-gray-900 border-x border-gray-200 py-3 focus:outline-none bg-transparent"
                   />
-                  <button @click="item.qty = Math.min(item.maxStock, +(item.qty + 1).toFixed(2))" class="px-2.5 py-1.5 text-gray-500 hover:bg-gray-100 font-bold">+</button>
+                  <button @click="item.qty = Math.min(item.maxStock, +(item.qty + 1).toFixed(2))" class="px-4 py-3 text-gray-600 hover:bg-gray-200 font-bold text-lg leading-none">+</button>
                 </div>
-                <select v-model="item.sellUnit" class="bg-white border border-gray-200 rounded-lg p-1.5 text-xs font-bold text-gray-600 focus:outline-none">
+                <select v-model="item.sellUnit" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm font-bold text-gray-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20">
                   <option value="Meter">Meter</option>
                   <option value="Yard">Yard</option>
                 </select>
               </div>
-              <div v-else class="mt-2">
-                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 inline-block">
+              <div v-else class="mt-2 mb-3">
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1.5 inline-block">
                   Roll utuh · {{ fmtNum(item.qty) }} {{ item.baseUnit }}
                 </span>
               </div>
 
-              <div v-if="!item.isUtuh && item.sellUnit !== item.baseUnit" class="text-[10px] text-amber-600 mt-1.5">
+              <div v-if="!item.isUtuh && item.sellUnit !== item.baseUnit" class="text-xs font-semibold text-amber-600 bg-amber-50 p-2 rounded-lg mb-3">
                 ⚠ Dikonversi otomatis ke {{ item.baseUnit }}
               </div>
 
-              <div class="grid grid-cols-2 gap-2 mt-2.5">
-                <div class="relative">
-                  <input v-model.number="item.unitPrice" type="number" min="0" placeholder="Harga / satuan"
-                    class="w-full bg-white border border-gray-200 rounded-lg p-2 pl-2.5 pr-7 text-xs font-bold text-gray-800 focus:outline-none focus:border-blue-400" />
-                  <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-300">Rp</span>
+              <div class="grid grid-cols-2 gap-3 mt-3">
+                <div>
+                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Harga / {{ item.sellUnit }}</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">Rp</span>
+                    <input v-model.number="item.unitPrice" type="number" min="0"
+                      class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 pl-9 text-sm font-bold text-gray-900 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:bg-white" />
+                  </div>
                 </div>
-                <div class="relative">
-                  <input v-model.number="item.discount" type="number" min="0" placeholder="Diskon"
-                    class="w-full bg-white border border-gray-200 rounded-lg p-2 pl-2.5 pr-7 text-xs font-bold text-gray-800 focus:outline-none focus:border-orange-400" />
-                  <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-300">Rp</span>
+                <div>
+                  <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Diskon</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-400">Rp</span>
+                    <input v-model.number="item.discount" type="number" min="0"
+                      class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 pl-9 text-sm font-bold text-gray-900 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20 focus:bg-white" />
+                  </div>
                 </div>
               </div>
 
-              <div class="flex justify-between items-center mt-2.5 pt-2 border-t border-gray-100">
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Subtotal</span>
-                <span class="text-sm font-bold text-gray-900 tabular-nums">{{ rupiah(subtotal(item)) }}</span>
+              <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Subtotal</span>
+                <span class="text-lg font-bold text-blue-700 tabular-nums">{{ rupiah(subtotal(item)) }}</span>
               </div>
             </div>
           </div>
 
-          <div class="border-t border-gray-100 px-5 py-4 space-y-2 shrink-0" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom))">
-            <div class="flex justify-between text-xs text-gray-500">
-              <span>Total diskon</span>
-              <span class="tabular-nums">{{ rupiah(totalDiscount) }}</span>
+          <div class="bg-white border-t border-gray-100 px-5 py-5 space-y-3 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom))">
+            <div class="flex justify-between text-sm text-gray-500 font-semibold">
+              <span>Total Diskon</span>
+              <span class="tabular-nums text-orange-500">-{{ rupiah(totalDiscount) }}</span>
             </div>
             <div class="flex justify-between items-baseline">
-              <span class="text-sm font-bold">Total</span>
-              <span class="text-xl font-bold tabular-nums">{{ rupiah(grandTotal) }}</span>
+              <span class="text-base font-bold text-gray-900">Total Pembayaran</span>
+              <span class="text-2xl font-black text-gray-900 tabular-nums">{{ rupiah(grandTotal) }}</span>
             </div>
             <button
               @click="prosesTransaksi"
               :disabled="cart.length === 0 || processing"
-              class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
+              class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition text-base shadow-lg shadow-blue-600/30 mt-2 flex items-center justify-center gap-2"
             >
-              {{ processing ? 'Memproses…' : 'Proses Transaksi' }}
+              <svg v-if="processing" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              {{ processing ? 'Memproses...' : 'Proses Transaksi' }}
             </button>
           </div>
         </div>
-      </div>
+      </Transition>
     </Teleport>
   </div>
 </template>

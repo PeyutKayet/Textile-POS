@@ -1,15 +1,31 @@
-import { serverSupabaseServiceRole } from '#supabase/server'
+import { serverSupabaseServiceRole, serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
+  const user = await serverSupabaseUser(event)
+  if (!user) {
+    throw createError({ statusCode: 401, statusMessage: 'Harus login dulu bos!' })
+  }
+
+  // Panggil Supabase dengan kekuatan Admin
+  const supabaseAdmin = serverSupabaseServiceRole(event)
+
+  // Cek apakah user yang request ini role-nya admin
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.role !== 'admin') {
+    throw createError({ statusCode: 403, statusMessage: 'Cuma bos (admin) yang bisa nambah pegawai!' })
+  }
+
   const body = await readBody(event)
   const { fullName, pin, tenantId, storeToken } = body
 
   if (!fullName || !pin || !tenantId || !storeToken) {
     throw createError({ statusCode: 400, statusMessage: 'Data tidak lengkap bos!' })
   }
-
-  // Panggil Supabase dengan kekuatan Admin (Bypass RLS & Auth)
-  const supabaseAdmin = serverSupabaseServiceRole(event)
 
   // Bikin email dummy: namatanpaspasi_token@juraganpos.app
   const safeName = fullName.replace(/\s+/g, '').toLowerCase()

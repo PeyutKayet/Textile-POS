@@ -359,7 +359,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -370,6 +370,7 @@ const tenantId = ref(null)
 // ── State ─────────────────────────────────────
 const fabrics = ref([])
 const searchQuery = ref('')
+const searchTimeout = ref(null)
 const selectedFabric = ref(null)
 const rolls = ref([])
 const loadingRolls = ref(false)
@@ -388,11 +389,7 @@ const fmtNum = (n) => Number(n || 0).toLocaleString('id-ID', { maximumFractionDi
 const rupiah = (n) => 'Rp ' + Math.max(0, Math.round(n || 0)).toLocaleString('id-ID')
 
 // ── Computed ──────────────────────────────────
-const filteredFabrics = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase()
-  if (!q) return []
-  return fabrics.value.filter(f => f.name.toLowerCase().includes(q))
-})
+const filteredFabrics = computed(() => fabrics.value)
 
 const subtotal = (item) => Math.max(0, (item.qty * (item.unitPrice || 0)) - (item.discount || 0))
 const totalDiscount = computed(() => cart.value.reduce((s, i) => s + (i.discount || 0), 0))
@@ -420,15 +417,29 @@ watchEffect(async () => {
     const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', userId).single()
     if (profile) {
       tenantId.value = profile.tenant_id
-      loadFabrics()
     }
   }
 })
 
-const loadFabrics = async () => {
-  const { data } = await supabase.from('fabrics').select('id, name, base_unit').order('name')
-  if (data) fabrics.value = data
-}
+// Debounced search database-side
+watch(searchQuery, (newVal) => {
+  const q = newVal.trim()
+  if (!q) {
+    fabrics.value = []
+    return
+  }
+  
+  if (searchTimeout.value) clearTimeout(searchTimeout.value)
+  searchTimeout.value = setTimeout(async () => {
+    const { data } = await supabase
+      .from('fabrics')
+      .select('id, name, base_unit')
+      .ilike('name', `%${q}%`)
+      .limit(20)
+    
+    if (data) fabrics.value = data
+  }, 300)
+})
 
 const pilihKain = async (fabric) => {
   selectedFabric.value = fabric

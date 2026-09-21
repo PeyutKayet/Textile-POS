@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, computed } from 'vue'
+import { ref, watchEffect, computed, watch } from 'vue'
 
 // Nempel ke layout dashboard
 definePageMeta({
@@ -91,11 +91,34 @@ const user = useSupabaseUser()
 const fabrics = ref([])
 const tenantId = ref(null)
 const searchQuery = ref('')
+const searchTimeout = ref(null)
 
-// Filter pencarian
-const filteredFabrics = computed(() => {
-  if (!searchQuery.value) return fabrics.value
-  return fabrics.value.filter(f => f.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
+// Filter pencarian (langsung mem-bypass data dari Supabase)
+const filteredFabrics = computed(() => fabrics.value)
+
+watch(searchQuery, (newVal) => {
+  const q = newVal.trim()
+  if (searchTimeout.value) clearTimeout(searchTimeout.value)
+  
+  searchTimeout.value = setTimeout(async () => {
+    let query = supabase.from('v_fabric_stocks').select('*').limit(20)
+    
+    if (q) {
+      query = query.ilike('name', `%${q}%`)
+    }
+    
+    const { data, error } = await query
+    
+    if (data) {
+      fabrics.value = data.map(fabric => ({
+        ...fabric,
+        totalRolls: fabric.total_rolls,
+        totalStock: fabric.total_stock
+      }))
+    } else if (error) {
+      console.error('Gagal cari data stok:', error.message)
+    }
+  }, 300)
 })
 
 // Tarik tenant_id user yang lagi login
@@ -106,7 +129,7 @@ watchEffect(async () => {
       .from('profiles')
       .select('tenant_id')
       .eq('id', userId)
-      .maybeSingle() // Ganti ke maybeSingle biar aplikasi gak macet/error 406
+      .maybeSingle()
 
     if (profile) {
       tenantId.value = profile.tenant_id
@@ -115,28 +138,21 @@ watchEffect(async () => {
   }
 })
 
-// Fungsi tarik data kain + relasi ke fabric_rolls buat hitung total stok
+// Fungsi tarik data kain menggunakan Database View
 const loadFabrics = async () => {
   const { data, error } = await supabase
-    .from('fabrics')
-    .select('*, fabric_rolls(id, current_length)')
-    .order('created_at', { ascending: false })
+    .from('v_fabric_stocks')
+    .select('*')
+    .limit(20)
   
   if (data) {
-    // Hitung manual total roll dan total stok per bahan
-    fabrics.value = data.map(fabric => {
-      const rolls = fabric.fabric_rolls || []
-      const totalRolls = rolls.length
-      const totalStock = Number(rolls.reduce((sum, r) => sum + Number(r.current_length), 0).toFixed(2))
-      
-      return {
-        ...fabric,
-        totalRolls,
-        totalStock
-      }
-    })
+    fabrics.value = data.map(fabric => ({
+      ...fabric,
+      totalRolls: fabric.total_rolls,
+      totalStock: fabric.total_stock
+    }))
   } else if (error) {
-    console.error('Gagal tarik data stok:', error.message)
+    console.error('Gagal tarik data stok awal:', error.message)
   }
 }
 </script>

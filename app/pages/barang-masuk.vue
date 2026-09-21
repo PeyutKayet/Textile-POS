@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, computed, nextTick } from 'vue'
+import { ref, watchEffect, computed, nextTick, watch } from 'vue'
 
 definePageMeta({
   layout: 'dashboard'
@@ -196,6 +196,7 @@ const selectedFabric = ref('')
 
 // State untuk fitur Search Bahan
 const searchQuery = ref('')
+const searchTimeout = ref(null)
 const showDropdown = ref(false)
 
 // Fungsi untuk menutup dropdown dengan delay biar klik di list gak ke-cancel
@@ -205,9 +206,25 @@ const tutupDropdown = () => {
   }, 200)
 }
 
-const filteredFabrics = computed(() => {
-  if (!searchQuery.value) return fabrics.value
-  return fabrics.value.filter(f => f.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
+const filteredFabrics = computed(() => fabrics.value)
+
+watch(searchQuery, (newVal) => {
+  const q = newVal.trim()
+  if (!q) {
+    fabrics.value = []
+    return
+  }
+  
+  if (searchTimeout.value) clearTimeout(searchTimeout.value)
+  searchTimeout.value = setTimeout(async () => {
+    const { data } = await supabase
+      .from('fabrics')
+      .select('id, name, sku')
+      .ilike('name', `%${q}%`)
+      .limit(20)
+    
+    if (data) fabrics.value = data
+  }, 300)
 })
 
 const pilihBahan = (fabric) => {
@@ -234,7 +251,7 @@ const rollList = ref([
   { initial_length: '', location: '' }
 ])
 
-// Ambil tenant_id lalu muat daftar master bahan
+// Ambil tenant_id
 watchEffect(async () => {
   const userId = user.value?.id || user.value?.sub
   if (userId) {
@@ -246,19 +263,9 @@ watchEffect(async () => {
 
     if (profile) {
       tenantId.value = profile.tenant_id
-      loadFabrics()
     }
   }
 })
-
-// Fungsi muat master bahan dari database
-const loadFabrics = async () => {
-  const { data } = await supabase
-    .from('fabrics')
-    .select('id, name, sku')
-  
-  if (data) fabrics.value = data
-}
 
 // Fungsi simpan bahan baru langsung dari form Inbound
 const simpanBahanBaru = async () => {
